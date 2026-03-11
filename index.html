@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>KupAlarm v2 - Main</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:#121212;
+  color:white;
+  text-align:center;
+  margin-top:80px;
+}
+
+.container{
+  background:#1e1e1e;
+  padding:30px;
+  border-radius:12px;
+  width:380px;
+  margin:auto;
+  box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
+
+h1{
+  color:#ff5252;
+}
+
+input,select,button{
+  padding:10px;
+  margin:10px;
+  font-size:16px;
+  border-radius:5px;
+  border:none;
+}
+
+button{
+  background:#ff5252;
+  color:white;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#ff3030;
+}
+
+#info{
+  margin-top:10px;
+  font-size:14px;
+  color:#aaa;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>KupAlarm v2 ⏰</h1>
+
+<input type="time" id="alarmTime">
+
+<br>
+
+<select id="difficulty" onchange="updateInfo()">
+<option value="easy">Easy</option>
+<option value="medium">Medium</option>
+<option value="hard">Hard</option>
+<option value="extreme">Extreme</option>
+</select>
+
+<div id="info"></div>
+
+<br>
+
+<button onclick="goToAlarm()">Set Alarm</button>
+
+</div>
+
+<script>
+
+function updateInfo(){
+
+const difficulty = document.getElementById("difficulty").value
+let text=""
+
+if(difficulty=="easy"){
+text="2 simple math questions"
+}
+else if(difficulty=="medium"){
+text="3 normal math questions"
+}
+else if(difficulty=="hard"){
+text="4 multiplication questions"
+}
+else{
+text="5 extreme brain damage questions"
+}
+
+document.getElementById("info").innerText=text
+}
+
+updateInfo()
+
+function goToAlarm(){
+
+const time = document.getElementById("alarmTime").value
+const difficulty = document.getElementById("difficulty").value
+
+if(!time){
+alert("Set a time boss!")
+return
+}
+
+let questions=3
+
+if(difficulty=="easy") questions=2
+if(difficulty=="medium") questions=3
+if(difficulty=="hard") questions=4
+if(difficulty=="extreme") questions=5
+
+window.location.href =
+`alarm.html?time=${time}&difficulty=${difficulty}&q=${questions}`
+
+}
+
+</script>
+
+</body>
+</html>

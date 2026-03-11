@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>KupAlarm v2 - Alarm</title>
+
+<style>
+body{
+font-family:Arial;
+background:#121212;
+color:white;
+text-align:center;
+margin-top:50px;
+}
+
+.container{
+background:#1e1e1e;
+padding:30px;
+border-radius:12px;
+width:380px;
+margin:auto;
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
+
+h1{
+color:#ff5252;
+}
+
+input,button{
+padding:10px;
+margin:10px;
+font-size:16px;
+border-radius:5px;
+border:none;
+}
+
+button{
+background:#ff5252;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#ff3030;
+}
+
+#questionBox{
+display:none;
+margin-top:20px;
+}
+
+#stats{
+margin-top:20px;
+font-size:14px;
+color:#bbb;
+}
+
+video{
+margin-top:15px;
+border-radius:10px;
+display:none;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>KupAlarm v2 ⏰</h1>
+
+<h3 id="status"></h3>
+
+<div id="questionBox">
+
+<h2 id="question"></h2>
+
+<input type="number" id="answer">
+
+<br>
+
+<button onclick="checkAnswer()">Submit</button>
+
+<p id="progress"></p>
+
+</div>
+
+<div id="stats"></div>
+
+<!-- VIDEO (GitHub compatible path) -->
+<video id="alarmVideo" width="350" loop>
+<source src="IMG_1319.mp4" type="video/mp4">
+</video>
+
+</div>
+
+<audio id="alarmSound" loop>
+<source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3">
+</audio>
+
+<script>
+
+// GET URL DATA
+const urlParams = new URLSearchParams(window.location.search)
+const alarmTime = urlParams.get('time')
+const difficulty = urlParams.get('difficulty')
+const questionsRequired = parseInt(urlParams.get('q')) || 3
+
+document.getElementById("status").innerText =
+"Alarm set for " + alarmTime
+
+let correctAnswer = null
+let answered = 0
+let startTime = 0
+let questionTimer = null
+let alarmStarted = false
+
+
+// CHECK TIME EVERY SECOND
+setInterval(()=>{
+
+const now = new Date()
+
+const currentTime =
+now.getHours().toString().padStart(2,'0') + ":" +
+now.getMinutes().toString().padStart(2,'0')
+
+if(alarmTime === currentTime && !alarmStarted){
+
+alarmStarted = true
+startAlarm()
+
+}
+
+},1000)
+
+
+// START ALARM
+function startAlarm(){
+
+const alarmSound = document.getElementById("alarmSound")
+const alarmVideo = document.getElementById("alarmVideo")
+
+alarmSound.play()
+
+alarmVideo.style.display="block"
+alarmVideo.play()
+
+document.getElementById("questionBox").style.display="block"
+
+answered = 0
+startTime = Date.now()
+
+generateQuestion()
+
+}
+
+
+// GENERATE QUESTION
+function generateQuestion(){
+
+let a,b
+
+const questionElem = document.getElementById("question")
+
+if(difficulty=="easy"){
+
+a = Math.floor(Math.random()*10)
+b = Math.floor(Math.random()*10)
+
+correctAnswer = a+b
+questionElem.innerText = a+" + "+b+" = ?"
+
+}
+
+else if(difficulty=="medium"){
+
+a = Math.floor(Math.random()*50)
+b = Math.floor(Math.random()*50)
+
+correctAnswer = a+b
+questionElem.innerText = a+" + "+b+" = ?"
+
+}
+
+else if(difficulty=="hard"){
+
+a = Math.floor(Math.random()*12)
+b = Math.floor(Math.random()*12)
+
+correctAnswer = a*b
+questionElem.innerText = a+" × "+b+" = ?"
+
+}
+
+else{
+
+a = Math.floor(Math.random()*100)
+b = Math.floor(Math.random()*50)
+
+correctAnswer = a-b
+questionElem.innerText = a+" - "+b+" = ?"
+
+}
+
+document.getElementById("progress").innerText =
+"Question " + (answered+1) + " of " + questionsRequired
+
+
+// QUESTION TIMER BY DIFFICULTY
+let changeTime = 5
+
+if(difficulty=="easy") changeTime=5
+if(difficulty=="medium") changeTime=4
+if(difficulty=="hard") changeTime=3
+if(difficulty=="extreme") changeTime=2
+
+clearTimeout(questionTimer)
+
+questionTimer = setTimeout(()=>{
+generateQuestion()
+}, changeTime * 1000)
+
+}
+
+
+// CHECK ANSWER
+function checkAnswer(){
+
+let userAnswer = parseInt(
+document.getElementById("answer").value
+)
+
+if(userAnswer === correctAnswer){
+
+answered++
+
+document.getElementById("answer").value=""
+
+if(answered >= questionsRequired){
+
+stopAlarm()
+
+}else{
+
+generateQuestion()
+
+}
+
+}
+
+else{
+
+let insults = [
+"kupal kaba boss!",
+"aray mo!",
+"baliw kaba!",
+"bobo kaba!"
+]
+
+alert(insults[
+Math.floor(Math.random()*insults.length)
+])
+
+}
+
+}
+
+
+// STOP ALARM
+function stopAlarm(){
+
+const alarmSound = document.getElementById("alarmSound")
+const alarmVideo = document.getElementById("alarmVideo")
+
+alarmSound.pause()
+alarmVideo.pause()
+alarmVideo.style.display="none"
+
+clearTimeout(questionTimer)
+
+let endTime = Date.now()
+
+let totalTime =
+Math.floor((endTime-startTime)/1000)
+
+alert("BUHAY NA SI TANGA " + totalTime + " seconds.")
+
+saveStats(totalTime)
+
+document.getElementById("questionBox").style.display="none"
+
+}
+
+
+// SAVE STATS
+function saveStats(time){
+
+let stats =
+JSON.parse(localStorage.getItem("kupStats")) || []
+
+stats.push(time)
+
+localStorage.setItem(
+"kupStats",
+JSON.stringify(stats)
+)
+
+showStats()
+
+}
+
+
+// SHOW STATS
+function showStats(){
+
+let stats =
+JSON.parse(localStorage.getItem("kupStats")) || []
+
+if(stats.length==0) return
+
+let avg =
+stats.reduce((a,b)=>a+b,0)/stats.length
+
+document.getElementById("stats").innerText =
+"Average wake-up solve time: " +
+avg.toFixed(1) + " seconds"
+
+}
+
+showStats()
+
+</script>
+
+</body>
+</html>
