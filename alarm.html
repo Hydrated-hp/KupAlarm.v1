@@ -109,7 +109,6 @@ margin:5px;
 
 <script>
 
-// PARAMETERS
 const urlParams=new URLSearchParams(window.location.search)
 
 const alarmTime=urlParams.get('time')
@@ -126,8 +125,33 @@ let alarmStarted=false
 let alarmFinished=false
 let startTime=0
 
+// AUDIO UNLOCK (mobile fix)
+
+let audioUnlocked=false
+
+function unlockAudio(){
+
+if(audioUnlocked) return
+
+const sound=document.getElementById("alarmSound")
+
+sound.play().then(()=>{
+
+sound.pause()
+sound.currentTime=0
+
+audioUnlocked=true
+
+}).catch(()=>{})
+
+}
+
+document.addEventListener("touchstart",unlockAudio,{once:true})
+document.addEventListener("click",unlockAudio,{once:true})
+
 
 // CLOCK CHECK
+
 setInterval(()=>{
 
 const now=new Date()
@@ -147,6 +171,7 @@ startAlarm()
 
 
 // START ALARM
+
 function startAlarm(){
 
 startTime=Date.now()
@@ -158,12 +183,11 @@ document.getElementById("questionBox").style.display="block"
 
 video.style.display="block"
 
-// force video play
 video.currentTime=0
 video.play().catch(()=>{})
 
-// play sound
 sound.currentTime=0
+sound.volume=1
 sound.play().catch(()=>{})
 
 generateQuestion()
@@ -172,6 +196,7 @@ generateQuestion()
 
 
 // GENERATE QUESTION
+
 function generateQuestion(){
 
 if(alarmFinished) return
@@ -232,6 +257,7 @@ questionTimer=setTimeout(generateQuestion,4000)
 
 
 // CHECK ANSWER
+
 function checkAnswer(){
 
 if(alarmFinished) return
@@ -268,6 +294,7 @@ alert("Wrong answer boss!")
 
 
 // STOP ALARM
+
 function stopAlarm(){
 
 alarmFinished=true
@@ -298,6 +325,7 @@ showResult(totalTime)
 
 
 // SAVE STATS
+
 function saveStats(time){
 
 let stats=JSON.parse(localStorage.getItem("kupStats"))||[]
@@ -310,6 +338,7 @@ localStorage.setItem("kupStats",JSON.stringify(stats))
 
 
 // SHOW RESULT
+
 function showResult(time){
 
 let stats=JSON.parse(localStorage.getItem("kupStats"))||[]
@@ -336,6 +365,7 @@ document.getElementById("attempts").innerText=
 
 
 // HOME BUTTON
+
 function goHome(){
 
 window.location.href="index.html"
@@ -344,6 +374,7 @@ window.location.href="index.html"
 
 
 // ENTER KEY
+
 document.getElementById("answer").addEventListener("keypress",function(e){
 
 if(e.key==="Enter"){
