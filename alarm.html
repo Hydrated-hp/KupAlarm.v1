@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>KupAlarm v3</title>
+<title>KupAlarm v2.5</title>
 
 <style>
 
@@ -43,13 +43,13 @@ background:#ff3030;
 }
 
 #questionBox{display:none;}
+
 #resultBox{display:none;}
 
 video{
 margin-top:15px;
 border-radius:10px;
 display:none;
-width:100%;
 }
 
 .stat{
@@ -58,6 +58,7 @@ margin:5px;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -82,6 +83,8 @@ margin:5px;
 
 </div>
 
+<!-- RESULT SCREEN -->
+
 <div id="resultBox">
 
 <h2>Alarm Stopped ✅</h2>
@@ -97,18 +100,19 @@ margin:5px;
 
 </div>
 
-<video id="alarmVideo" loop autoplay muted playsinline preload="auto">
+<video id="alarmVideo" width="350" loop playsinline>
 <source src="IMG_1319.mp4" type="video/mp4">
 </video>
 
 </div>
 
-<audio id="alarmSound" loop preload="auto">
+<audio id="alarmSound" loop>
 <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3">
 </audio>
 
 <script>
 
+// URL PARAMETERS
 const urlParams=new URLSearchParams(window.location.search)
 
 const alarmTime=urlParams.get('time')
@@ -125,33 +129,8 @@ let alarmStarted=false
 let alarmFinished=false
 let startTime=0
 
-// AUDIO UNLOCK (mobile fix)
-
-let audioUnlocked=false
-
-function unlockAudio(){
-
-if(audioUnlocked) return
-
-const sound=document.getElementById("alarmSound")
-
-sound.play().then(()=>{
-
-sound.pause()
-sound.currentTime=0
-
-audioUnlocked=true
-
-}).catch(()=>{})
-
-}
-
-document.addEventListener("touchstart",unlockAudio,{once:true})
-document.addEventListener("click",unlockAudio,{once:true})
-
 
 // CLOCK CHECK
-
 setInterval(()=>{
 
 const now=new Date()
@@ -171,7 +150,6 @@ startAlarm()
 
 
 // START ALARM
-
 function startAlarm(){
 
 startTime=Date.now()
@@ -183,12 +161,8 @@ document.getElementById("questionBox").style.display="block"
 
 video.style.display="block"
 
-video.currentTime=0
-video.play().catch(()=>{})
-
-sound.currentTime=0
-sound.volume=1
 sound.play().catch(()=>{})
+video.play().catch(()=>{})
 
 generateQuestion()
 
@@ -196,7 +170,6 @@ generateQuestion()
 
 
 // GENERATE QUESTION
-
 function generateQuestion(){
 
 if(alarmFinished) return
@@ -257,7 +230,6 @@ questionTimer=setTimeout(generateQuestion,4000)
 
 
 // CHECK ANSWER
-
 function checkAnswer(){
 
 if(alarmFinished) return
@@ -294,7 +266,6 @@ alert("Wrong answer boss!")
 
 
 // STOP ALARM
-
 function stopAlarm(){
 
 alarmFinished=true
@@ -325,7 +296,6 @@ showResult(totalTime)
 
 
 // SAVE STATS
-
 function saveStats(time){
 
 let stats=JSON.parse(localStorage.getItem("kupStats"))||[]
@@ -338,14 +308,14 @@ localStorage.setItem("kupStats",JSON.stringify(stats))
 
 
 // SHOW RESULT
-
 function showResult(time){
 
 let stats=JSON.parse(localStorage.getItem("kupStats"))||[]
 
 let fastest=Math.min(...stats)
 
-let avg=stats.reduce((a,b)=>a+b,0)/stats.length
+let avg=
+stats.reduce((a,b)=>a+b,0)/stats.length
 
 document.getElementById("resultBox").style.display="block"
 
@@ -364,8 +334,7 @@ document.getElementById("attempts").innerText=
 }
 
 
-// HOME BUTTON
-
+// GO HOME
 function goHome(){
 
 window.location.href="index.html"
@@ -373,8 +342,7 @@ window.location.href="index.html"
 }
 
 
-// ENTER KEY
-
+// ENTER KEY SUBMIT
 document.getElementById("answer").addEventListener("keypress",function(e){
 
 if(e.key==="Enter"){
