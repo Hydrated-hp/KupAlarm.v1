@@ -43,7 +43,6 @@ background:#ff3030;
 }
 
 #questionBox{display:none;}
-
 #resultBox{display:none;}
 
 video{
@@ -59,7 +58,6 @@ margin:5px;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -99,19 +97,19 @@ margin:5px;
 
 </div>
 
-<video id="alarmVideo" loop autoplay muted playsinline>
+<video id="alarmVideo" loop autoplay muted playsinline preload="auto">
 <source src="IMG_1319.mp4" type="video/mp4">
 </video>
 
 </div>
 
-<audio id="alarmSound" loop>
+<audio id="alarmSound" loop preload="auto">
 <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3">
 </audio>
 
 <script>
 
-// URL PARAMETERS
+// PARAMETERS
 const urlParams=new URLSearchParams(window.location.search)
 
 const alarmTime=urlParams.get('time')
@@ -160,13 +158,13 @@ document.getElementById("questionBox").style.display="block"
 
 video.style.display="block"
 
-video.muted=false
-
+// force video play
+video.currentTime=0
 video.play().catch(()=>{})
-sound.play().catch(()=>{})
 
-// optional fullscreen
-document.documentElement.requestFullscreen().catch(()=>{})
+// play sound
+sound.currentTime=0
+sound.play().catch(()=>{})
 
 generateQuestion()
 
@@ -318,8 +316,7 @@ let stats=JSON.parse(localStorage.getItem("kupStats"))||[]
 
 let fastest=Math.min(...stats)
 
-let avg=
-stats.reduce((a,b)=>a+b,0)/stats.length
+let avg=stats.reduce((a,b)=>a+b,0)/stats.length
 
 document.getElementById("resultBox").style.display="block"
 
@@ -346,7 +343,7 @@ window.location.href="index.html"
 }
 
 
-// ENTER KEY SUBMIT
+// ENTER KEY
 document.getElementById("answer").addEventListener("keypress",function(e){
 
 if(e.key==="Enter"){
