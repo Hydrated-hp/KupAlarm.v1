@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>KupAlarm v2 - Alarm</title>
+<title>KupAlarm v3</title>
 
 <style>
 
@@ -10,7 +10,7 @@ font-family:Arial;
 background:#121212;
 color:white;
 text-align:center;
-margin-top:50px;
+margin-top:40px;
 }
 
 .container{
@@ -22,9 +22,7 @@ margin:auto;
 box-shadow:0 0 20px rgba(0,0,0,0.5);
 }
 
-h1{
-color:#ff5252;
-}
+h1{color:#ff5252;}
 
 input,button{
 padding:10px;
@@ -44,21 +42,20 @@ button:hover{
 background:#ff3030;
 }
 
-#questionBox{
-display:none;
-margin-top:20px;
-}
+#questionBox{display:none;}
 
-#stats{
-margin-top:20px;
-font-size:14px;
-color:#bbb;
-}
+#resultBox{display:none;}
 
 video{
 margin-top:15px;
 border-radius:10px;
 display:none;
+width:100%;
+}
+
+.stat{
+color:#ccc;
+margin:5px;
 }
 
 </style>
@@ -69,7 +66,7 @@ display:none;
 
 <div class="container">
 
-<h1>KupAlarm v2 ⏰</h1>
+<h1>KupAlarm ⏰</h1>
 
 <h3 id="status"></h3>
 
@@ -87,10 +84,22 @@ display:none;
 
 </div>
 
-<div id="stats"></div>
+<div id="resultBox">
 
-<!-- VIDEO (works on GitHub) -->
-<video id="alarmVideo" width="350" loop playsinline>
+<h2>Alarm Stopped ✅</h2>
+
+<p class="stat" id="timeTaken"></p>
+<p class="stat" id="fastest"></p>
+<p class="stat" id="average"></p>
+<p class="stat" id="attempts"></p>
+
+<br>
+
+<button onclick="goHome()">Go Back Home</button>
+
+</div>
+
+<video id="alarmVideo" loop autoplay muted playsinline>
 <source src="IMG_1319.mp4" type="video/mp4">
 </video>
 
@@ -102,35 +111,36 @@ display:none;
 
 <script>
 
-// GET URL DATA
-const urlParams = new URLSearchParams(window.location.search)
+// URL PARAMETERS
+const urlParams=new URLSearchParams(window.location.search)
 
-const alarmTime = urlParams.get('time')
-const difficulty = urlParams.get('difficulty')
-const questionsRequired = parseInt(urlParams.get('q')) || 3
+const alarmTime=urlParams.get('time')
+const difficulty=urlParams.get('difficulty')
+const questionsRequired=parseInt(urlParams.get('q'))||3
 
-document.getElementById("status").innerText =
-"Alarm set for " + alarmTime
+document.getElementById("status").innerText=
+"Alarm set for "+alarmTime
 
-let correctAnswer = null
-let answered = 0
-let startTime = 0
-let questionTimer = null
-let alarmStarted = false
+let correctAnswer
+let answered=0
+let questionTimer=null
+let alarmStarted=false
+let alarmFinished=false
+let startTime=0
 
 
-// CHECK TIME EVERY SECOND
+// CLOCK CHECK
 setInterval(()=>{
 
-const now = new Date()
+const now=new Date()
 
-const currentTime =
-now.getHours().toString().padStart(2,'0') + ":" +
+const currentTime=
+now.getHours().toString().padStart(2,'0')+":"+
 now.getMinutes().toString().padStart(2,'0')
 
-if(alarmTime === currentTime && !alarmStarted){
+if(currentTime===alarmTime && !alarmStarted){
 
-alarmStarted = true
+alarmStarted=true
 startAlarm()
 
 }
@@ -141,19 +151,22 @@ startAlarm()
 // START ALARM
 function startAlarm(){
 
-const alarmSound = document.getElementById("alarmSound")
-const alarmVideo = document.getElementById("alarmVideo")
+startTime=Date.now()
+
+const sound=document.getElementById("alarmSound")
+const video=document.getElementById("alarmVideo")
 
 document.getElementById("questionBox").style.display="block"
 
-answered = 0
-startTime = Date.now()
+video.style.display="block"
 
-alarmVideo.style.display="block"
+video.muted=false
 
-alarmVideo.play().catch(()=>{})
+video.play().catch(()=>{})
+sound.play().catch(()=>{})
 
-alarmSound.play().catch(()=>{})
+// optional fullscreen
+document.documentElement.requestFullscreen().catch(()=>{})
 
 generateQuestion()
 
@@ -163,67 +176,59 @@ generateQuestion()
 // GENERATE QUESTION
 function generateQuestion(){
 
-let a,b
+if(alarmFinished) return
 
-const questionElem = document.getElementById("question")
+let a,b
+const q=document.getElementById("question")
 
 if(difficulty=="easy"){
 
-a = Math.floor(Math.random()*10)
-b = Math.floor(Math.random()*10)
+a=Math.floor(Math.random()*10)
+b=Math.floor(Math.random()*10)
 
-correctAnswer = a+b
-questionElem.innerText = a+" + "+b+" = ?"
+correctAnswer=a+b
+q.innerText=a+" + "+b+" = ?"
 
 }
 
 else if(difficulty=="medium"){
 
-a = Math.floor(Math.random()*50)
-b = Math.floor(Math.random()*50)
+a=Math.floor(Math.random()*50)
+b=Math.floor(Math.random()*50)
 
-correctAnswer = a+b
-questionElem.innerText = a+" + "+b+" = ?"
+correctAnswer=a+b
+q.innerText=a+" + "+b+" = ?"
 
 }
 
 else if(difficulty=="hard"){
 
-a = Math.floor(Math.random()*12)
-b = Math.floor(Math.random()*12)
+a=Math.floor(Math.random()*12)
+b=Math.floor(Math.random()*12)
 
-correctAnswer = a*b
-questionElem.innerText = a+" × "+b+" = ?"
+correctAnswer=a*b
+q.innerText=a+" × "+b+" = ?"
 
 }
 
 else{
 
-a = Math.floor(Math.random()*100)
-b = Math.floor(Math.random()*50)
+a=Math.floor(Math.random()*100)
+b=Math.floor(Math.random()*50)
 
-correctAnswer = a-b
-questionElem.innerText = a+" - "+b+" = ?"
+correctAnswer=a-b
+q.innerText=a+" - "+b+" = ?"
 
 }
 
-document.getElementById("progress").innerText =
-"Question " + (answered+1) + " of " + questionsRequired
+document.getElementById("progress").innerText=
+"Question "+(answered+1)+" of "+questionsRequired
 
-
-// QUESTION TIMER
-let changeTime = 5
-
-if(difficulty=="easy") changeTime=5
-if(difficulty=="medium") changeTime=4
-if(difficulty=="hard") changeTime=3
-if(difficulty=="extreme") changeTime=2
+document.getElementById("answer").focus()
 
 clearTimeout(questionTimer)
 
-questionTimer = setTimeout(()=>{
-generateQuestion()
-}, changeTime * 1000)
+questionTimer=setTimeout(generateQuestion,4000)
 
 }
 
@@ -231,17 +236,19 @@ generateQuestion()
 // CHECK ANSWER
 function checkAnswer(){
 
-let userAnswer = parseInt(
+if(alarmFinished) return
+
+let userAnswer=parseInt(
 document.getElementById("answer").value
 )
 
-if(userAnswer === correctAnswer){
+if(userAnswer===correctAnswer){
 
 answered++
 
 document.getElementById("answer").value=""
 
-if(answered >= questionsRequired){
+if(answered>=questionsRequired){
 
 stopAlarm()
 
@@ -255,16 +262,7 @@ generateQuestion()
 
 else{
 
-let insults = [
-"kupal kaba boss!",
-"aray mo!",
-"baliw kaba!",
-"bobo kaba!"
-]
-
-alert(insults[
-Math.floor(Math.random()*insults.length)
-])
+alert("Wrong answer boss!")
 
 }
 
@@ -274,25 +272,29 @@ Math.floor(Math.random()*insults.length)
 // STOP ALARM
 function stopAlarm(){
 
-const alarmSound = document.getElementById("alarmSound")
-const alarmVideo = document.getElementById("alarmVideo")
-
-alarmSound.pause()
-alarmVideo.pause()
-alarmVideo.style.display="none"
+alarmFinished=true
 
 clearTimeout(questionTimer)
 
-let endTime = Date.now()
+const sound=document.getElementById("alarmSound")
+const video=document.getElementById("alarmVideo")
 
-let totalTime =
-Math.floor((endTime-startTime)/1000)
+sound.pause()
+sound.currentTime=0
 
-alert("BUHAY NA SI TANGA " + totalTime + " seconds.")
+video.pause()
+video.currentTime=0
+video.style.display="none"
+
+document.getElementById("questionBox").style.display="none"
+
+let endTime=Date.now()
+
+let totalTime=Math.floor((endTime-startTime)/1000)
 
 saveStats(totalTime)
 
-document.getElementById("questionBox").style.display="none"
+showResult(totalTime)
 
 }
 
@@ -300,49 +302,56 @@ document.getElementById("questionBox").style.display="none"
 // SAVE STATS
 function saveStats(time){
 
-let stats =
-JSON.parse(localStorage.getItem("kupStats")) || []
+let stats=JSON.parse(localStorage.getItem("kupStats"))||[]
 
 stats.push(time)
 
-localStorage.setItem(
-"kupStats",
-JSON.stringify(stats)
-)
-
-showStats()
+localStorage.setItem("kupStats",JSON.stringify(stats))
 
 }
 
 
-// SHOW STATS
-function showStats(){
+// SHOW RESULT
+function showResult(time){
 
-let stats =
-JSON.parse(localStorage.getItem("kupStats")) || []
+let stats=JSON.parse(localStorage.getItem("kupStats"))||[]
 
-if(stats.length==0) return
+let fastest=Math.min(...stats)
 
-let avg =
+let avg=
 stats.reduce((a,b)=>a+b,0)/stats.length
 
-document.getElementById("stats").innerText =
-"Average wake-up solve time: " +
-avg.toFixed(1) + " seconds"
+document.getElementById("resultBox").style.display="block"
+
+document.getElementById("timeTaken").innerText=
+"Your time: "+time+" seconds"
+
+document.getElementById("fastest").innerText=
+"Fastest: "+fastest+" seconds"
+
+document.getElementById("average").innerText=
+"Average: "+avg.toFixed(1)+" seconds"
+
+document.getElementById("attempts").innerText=
+"Total Attempts: "+stats.length
 
 }
 
-showStats()
+
+// HOME BUTTON
+function goHome(){
+
+window.location.href="index.html"
+
+}
 
 
-// MOBILE UNLOCK (tap once to allow audio/video)
-document.body.addEventListener("click", () => {
+// ENTER KEY SUBMIT
+document.getElementById("answer").addEventListener("keypress",function(e){
 
-const v = document.getElementById("alarmVideo")
-const a = document.getElementById("alarmSound")
-
-v.play().catch(()=>{})
-a.play().catch(()=>{})
+if(e.key==="Enter"){
+checkAnswer()
+}
 
 })
 
