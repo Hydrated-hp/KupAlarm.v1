@@ -1,0 +1,84 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI';
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color: white;
+}
+
+/* Layout */
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 300px;
+  background: rgba(0,0,0,0.4);
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.sidebar h1 {
+  color: cyan;
+}
+
+.sidebar input,
+.sidebar select,
+.sidebar button {
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.alarm-item {
+  background: rgba(255,255,255,0.1);
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+/* Alarm Screen */
+#alarmScreen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: black;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+video {
+  width: 400px;
+  border-radius: 15px;
+  box-shadow: 0 0 30px red;
+}
+
+#choices button {
+  margin: 5px;
+  padding: 10px;
+  background: red;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+}
+
+#choices button:hover {
+  transform: scale(1.1);
+}
+
+#snoozeBtn {
+  margin-top: 20px;
+  background: orange;
+}
