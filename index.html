@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>KupAlarm PRO</title>
+  <title>KupAlarm: Smart Alarm</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
-<div class="app">
+<!-- MAIN PAGE -->
+<div id="mainPage">
+  <div class="container">
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <h1>⏰ KupAlarm</h1>
-    <p id="clock"></p>
+    <!-- STUDY INFO -->
+    <div class="study-info">
+      <h2>KupAlarm: Smart Alarm with Question-Based Dismissal</h2>
+      <p><strong>Objectives:</strong></p>
+      <ul>
+        <li>Stay alert upon waking by answering a question.</li>
+        <li>Reduce oversleeping by making snooze harder.</li>
+        <li>Choose difficulty levels: easy, medium, hard, extreme.</li>
+        <li>Track your performance over time.</li>
+      </ul>
+    </div>
 
+    <!-- ALARM SETUP -->
     <input type="time" id="alarmTime">
     <select id="difficulty">
       <option value="easy">Easy</option>
@@ -22,35 +33,31 @@
       <option value="hard">Hard</option>
       <option value="extreme">Extreme</option>
     </select>
-
     <button onclick="addAlarm()">Add Alarm</button>
-    <button onclick="clearAlarms()">Clear All</button>
-    <button onclick="toggleStats()">Toggle Stats</button>
-  </div>
 
-  <!-- MAIN -->
-  <div class="main">
-    <h2>Your Alarms</h2>
+    <h3>Your Alarms</h3>
     <div id="alarmList"></div>
 
-    <div id="statsBox">
-      <h3>Statistics</h3>
+    <button onclick="toggleStats()">View Stats</button>
+    <div id="statsBox" style="display:none;">
       <p id="fastest"></p>
       <p id="average"></p>
       <p id="attempts"></p>
+      <p id="lastTimeStats"></p>
+      <canvas id="statsChart" width="400" height="200"></canvas>
       <p id="streak"></p>
-      <canvas id="statsChart"></canvas>
+      <p id="totalAnswered"></p>
     </div>
-  </div>
 
+  </div>
 </div>
 
 <!-- ALARM SCREEN -->
-<div id="alarmScreen">
-  <h1>WAKE UP 🚨</h1>
+<div id="alarmScreen" class="alarm-screen">
+  <h1>Alarm Active ⏰</h1>
 
-  <video id="alarmVideo" loop>
-    <source src="IMG_1319.mp4">
+  <video id="alarmVideo" loop playsinline>
+    <source src="IMG_1319.mp4" type="video/mp4">
   </video>
 
   <audio id="alarmSound" loop>
@@ -60,11 +67,16 @@
   <div id="questionBox">
     <h2 id="question"></h2>
     <div id="choices"></div>
-    <p id="progress"></p>
+    <p id="questionProgress"></p>
   </div>
 
-  <button id="snoozeBtn" onclick="snooze()">Snooze (1x)</button>
-
+  <div id="resultBox" style="display:none;">
+    <h2>Alarm Stopped ✅</h2>
+    <p id="timeTaken"></p>
+    <p id="attemptsResult"></p>
+    <p id="lastTimeResult"></p>
+    <button onclick="closeAlarm()">Close</button>
+  </div>
 </div>
 
 <script src="script.js"></script>
