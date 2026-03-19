@@ -1,130 +1,72 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>KupAlarm v2 - Main</title>
-
-<style>
-body{
-  font-family:Arial;
-  background:#121212;
-  color:white;
-  text-align:center;
-  margin-top:80px;
-}
-
-.container{
-  background:#1e1e1e;
-  padding:30px;
-  border-radius:12px;
-  width:380px;
-  margin:auto;
-  box-shadow:0 0 20px rgba(0,0,0,0.5);
-}
-
-h1{
-  color:#ff5252;
-}
-
-input,select,button{
-  padding:10px;
-  margin:10px;
-  font-size:16px;
-  border-radius:5px;
-  border:none;
-}
-
-button{
-  background:#ff5252;
-  color:white;
-  cursor:pointer;
-}
-
-button:hover{
-  background:#ff3030;
-}
-
-#info{
-  margin-top:10px;
-  font-size:14px;
-  color:#aaa;
-}
-</style>
-
+  <title>KupAlarm PRO</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
-<div class="container">
+<div class="app">
 
-<h1>KupAlarm v2 ⏰</h1>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h1>⏰ KupAlarm</h1>
+    <p id="clock"></p>
 
-<input type="time" id="alarmTime">
+    <input type="time" id="alarmTime">
+    <select id="difficulty">
+      <option value="easy">Easy</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+      <option value="extreme">Extreme</option>
+    </select>
 
-<br>
+    <button onclick="addAlarm()">Add Alarm</button>
+    <button onclick="clearAlarms()">Clear All</button>
+    <button onclick="toggleStats()">Toggle Stats</button>
+  </div>
 
-<select id="difficulty" onchange="updateInfo()">
-<option value="easy">Easy</option>
-<option value="medium">Medium</option>
-<option value="hard">Hard</option>
-<option value="extreme">Extreme</option>
-</select>
+  <!-- MAIN -->
+  <div class="main">
+    <h2>Your Alarms</h2>
+    <div id="alarmList"></div>
 
-<div id="info"></div>
-
-<br>
-
-<button onclick="goToAlarm()">Set Alarm</button>
+    <div id="statsBox">
+      <h3>Statistics</h3>
+      <p id="fastest"></p>
+      <p id="average"></p>
+      <p id="attempts"></p>
+      <p id="streak"></p>
+      <canvas id="statsChart"></canvas>
+    </div>
+  </div>
 
 </div>
 
-<script>
+<!-- ALARM SCREEN -->
+<div id="alarmScreen">
+  <h1>WAKE UP 🚨</h1>
 
-function updateInfo(){
+  <video id="alarmVideo" loop>
+    <source src="IMG_1319.mp4">
+  </video>
 
-const difficulty = document.getElementById("difficulty").value
-let text=""
+  <audio id="alarmSound" loop>
+    <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3">
+  </audio>
 
-if(difficulty=="easy"){
-text="2 simple math questions"
-}
-else if(difficulty=="medium"){
-text="3 normal math questions"
-}
-else if(difficulty=="hard"){
-text="4 multiplication questions"
-}
-else{
-text="5 extreme brain damage questions"
-}
+  <div id="questionBox">
+    <h2 id="question"></h2>
+    <div id="choices"></div>
+    <p id="progress"></p>
+  </div>
 
-document.getElementById("info").innerText=text
-}
+  <button id="snoozeBtn" onclick="snooze()">Snooze (1x)</button>
 
-updateInfo()
+</div>
 
-function goToAlarm(){
-
-const time = document.getElementById("alarmTime").value
-const difficulty = document.getElementById("difficulty").value
-
-if(!time){
-alert("Set a time boss!")
-return
-}
-
-let questions=3
-
-if(difficulty=="easy") questions=2
-if(difficulty=="medium") questions=3
-if(difficulty=="hard") questions=4
-if(difficulty=="extreme") questions=5
-
-window.location.href =
-`alarm.html?time=${time}&difficulty=${difficulty}&q=${questions}`
-
-}
-
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
